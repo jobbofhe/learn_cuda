@@ -96,15 +96,19 @@ int main(int argc, char const *argv[])
     // 
     // 问题又来了，为什么不是写 int  tid = blockIdx呢？ 事实上，这是因为cuda支持二维的线程块数组，对于二维空间的计算问题，
     // 例如矩阵数学运算或者图像处理，使用二维索引往往回答来很大的便利，因为他可以避免将线性索引转换为矩形索引。
-    add<<<1, 65535>>>(dev_a, dev_b, dev_c);
+    add<<<32, 512>>>(dev_a, dev_b, dev_c);
 
     gettimeofday(&tv2, NULL);
     float time = (1000000 * (tv2.tv_sec - tv1.tv_sec) + tv2.tv_usec- tv1.tv_usec)/1000.0;
-    cout << "time gpu： " << time << "ms";
+    cout << "time gpu： " << time << "ms\n";
 
 
     cudaMemcpy(c, dev_c,  N * sizeof(int), cudaMemcpyDeviceToHost);
-    cout << ", num : " << c[N-1] << endl;
+    for(unsigned i = 0; i < 10; ++i) 
+    {
+        printf("%2d + %2d = %2d\n", a[i], b[i], c[i]);
+    }
+    
 
     cudaFree(dev_a);
     cudaFree(dev_b);
